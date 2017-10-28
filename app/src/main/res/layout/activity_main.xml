@@ -11,7 +11,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="Event Tag"
-        android:inputType="textPassword" />
+        android:inputType="text" />
 
     <EditText
         android:id="@+id/numPeople"
@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:hint="event tag to search"
         android:layout_below="@id/addEvent"
-        android:inputType="textPassword" />
+        android:inputType="text" />
 
     <Button
         android:id="@+id/searchForEvent"
@@ -49,5 +49,12 @@
         android:layout_marginTop="30dp"
         android:text="search for event"
         android:onClick="searchForEvent"/>
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/searchForEvent"
+        android:text="address" />
 
 </RelativeLayout>

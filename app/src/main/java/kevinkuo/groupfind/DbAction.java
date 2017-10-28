@@ -1,5 +1,6 @@
 package kevinkuo.groupfind;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,13 +10,15 @@ import java.util.List;
 
 public class DbAction {
 
+    static final List<Event> eventList = new ArrayList<>();
+
     public static void addEvent(final Event event) {
-        // TODO: implement
+        // testing
+        eventList.add(event);
     }
 
     public static List<Event> getEvents(final String tag) {
-        // TODO: implement
-
-        return Collections.emptyList();
+        // testing
+        return eventList;
     }
 }

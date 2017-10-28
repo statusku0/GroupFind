@@ -1,9 +1,19 @@
 package kevinkuo.groupfind;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Geocoder;
+import android.location.Location;
+import android.os.Handler;
+import android.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.Manifest;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -12,6 +22,16 @@ public class MainActivity extends AppCompatActivity {
     public EditText eventTag;
     public EditText numPeople;
     public EditText eventTagToSearch;
+    public TextView address;
+
+    private Location currentLocation;
+    private String currentAddress;
+    private AddressResultReceiver addressResultReceiver;
+    private LocationResultReceiver locationResultReceiver;
+
+    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 0;
+
+    private String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,20 +41,173 @@ public class MainActivity extends AppCompatActivity {
         eventTag = (EditText) findViewById(R.id.eventTag);
         numPeople = (EditText) findViewById(R.id.numPeople);
         eventTagToSearch = (EditText) findViewById(R.id.eventTagToSearch);
+        address = (TextView) findViewById(R.id.address);
+
+        // request location permissions if necessary
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSION_ACCESS_FINE_LOCATION);
+
+            return;
+        }
+
+        // if location permission granted
+        addressResultReceiver = new AddressResultReceiver(new Handler());
+        locationResultReceiver = new LocationResultReceiver(new Handler());
+        Log.d(TAG, "receivers instantiated");
+    }
+
+    /**
+     * Class extending ResultReceiver that, when receiving a location result, updates the displayed
+     * location, address, and fetches Creation objects for the current location.
+     */
+    class LocationResultReceiver extends ResultReceiver {
+        public LocationResultReceiver(Handler handler) { super(handler); }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+            currentLocation = resultData.getParcelable("LOCATION_KEY");
+            getAddress();
+        }
+
+    }
+
+    /**
+     * Class extending ResultReceiver that, when receiving an address result, updates the
+     * displayed address.
+     */
+    class AddressResultReceiver extends ResultReceiver {
+        public AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string
+            // or an error message sent from the intent service.
+            currentAddress = resultData.getString(LocationConstants.RESULT_DATA_KEY);
+            currentAddress = modifyAddress(currentAddress);
+            displayAddressOutput();
+
+            Log.d(TAG, "address found");
+
+        }
+    }
+
+    private String modifyAddress(final String address) {
+        String edited_adr = "";
+        int cnt = 0;
+        for (int k1 = 0; k1 < address.length(); k1++) {
+            if (address.charAt(k1) == 10) {
+                cnt++;
+                if (cnt > 1) {
+                    edited_adr += ", ";
+                } else {
+                    edited_adr += (char) 10;
+                }
+            } else {
+                edited_adr += address.charAt(k1);
+            }
+        }
+
+        return edited_adr;
+    }
+
+    private void displayAddressOutput() {
+        address.setText(currentAddress);
+    }
+
+    /**
+     * Starts the FetchAddressIntentService to fetch the current address from
+     * surrounding geocodes.
+     */
+    protected void getAddress() {
+        if (currentLocation != null) {
+            // Determine whether a Geocoder is available.
+            if (!Geocoder.isPresent()) {
+                Toast.makeText(this, "no geocoder available",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            ServiceStarter.startAddressIntentService(
+                    getApplicationContext(), addressResultReceiver, currentLocation);
+        }
     }
 
     public void addEvent(View button) {
-        // create new event, grabbing from edittexts
         final Event newEvent = new Event(getEventTag(), getNumPeople(), getLocation());
         DbAction.addEvent(newEvent);
     }
 
     public void searchForEvent(View button) {
         final List<Event> eventList = DbAction.getEvents(getEventTagToSearch());
+        startActivity(EventUtilities.createIntent(
+                eventList, MainActivity.this, ShowEventsActivity.class));
+    }
+
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "permission granted");
+
+                    addressResultReceiver = new AddressResultReceiver(new Handler());
+                    locationResultReceiver = new LocationResultReceiver(new Handler());
+
+                    Log.d(TAG, "starting location service");
+                    ServiceStarter.startLocationService(getApplicationContext(),
+                            locationResultReceiver);
+
+                } else {
+                    Log.d(TAG, "permission not granted");
+                }
+                return;
+            }
+        }
+    }
 
 
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart called");
+        super.onStart();
+    }
 
+    @Override
+    protected void onStop() {
+        Log.d(TAG, "onStop called");
+        super.onStop();
+        if (!isChangingConfigurations()) {
+            Log.d(TAG, "stopping location service");
+            this.stopService(new Intent(this, LocationService.class));
+        }
 
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause called");
+        super.onPause();
+        if (!isChangingConfigurations()) {
+            Log.d(TAG, "stopping location service");
+            this.stopService(new Intent(this, LocationService.class));
+        }
+
+    }
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume called");
+        super.onResume();
+        Log.d(TAG, "starting location service");
+        ServiceStarter.startLocationService(getApplicationContext(),
+                locationResultReceiver);
 
     }
 
@@ -47,17 +220,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getLocation() {
-        // TODO: implement
-
-        return "";
+        return address.getText().toString();
     }
 
     private String getEventTagToSearch() {
         return eventTagToSearch.getText().toString();
-    }
-
-    private void displayEvents() {
-        // TODO: implement
     }
 
 }

@@ -31,7 +31,7 @@ public class EventAdapter extends ArrayAdapter<Event> {
         final TextView location = (TextView) view.findViewById(R.id.entryLocation);
 
         tag.setText(event.getTag());
-        numPeople.setText(event.getNumPeople());
+        numPeople.setText(Integer.toString(event.getNumPeople()));
         location.setText(event.getLocation());
 
         return view;
