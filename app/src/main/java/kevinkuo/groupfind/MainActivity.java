@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     public EditText eventTag;
     public EditText numPeople;
+    public EditText eventTagToSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,16 +20,18 @@ public class MainActivity extends AppCompatActivity {
 
         eventTag = (EditText) findViewById(R.id.eventTag);
         numPeople = (EditText) findViewById(R.id.numPeople);
+        eventTagToSearch = (EditText) findViewById(R.id.eventTagToSearch);
     }
 
     public void addEvent(View button) {
         // create new event, grabbing from edittexts
-        final Event newEvent = new Event(getEventTag(), getNumPeople());
+        final Event newEvent = new Event(getEventTag(), getNumPeople(), getLocation());
         DbAction.addEvent(newEvent);
     }
 
     public void searchForEvent(View button) {
-        // show popup to input tag
+        final List<Event> eventList = DbAction.getEvents(getEventTagToSearch());
+
 
 
 
@@ -39,6 +44,16 @@ public class MainActivity extends AppCompatActivity {
 
     private int getNumPeople() {
         return Integer.parseInt(numPeople.getText().toString());
+    }
+
+    private String getLocation() {
+        // TODO: implement
+
+        return "";
+    }
+
+    private String getEventTagToSearch() {
+        return eventTagToSearch.getText().toString();
     }
 
     private void displayEvents() {
