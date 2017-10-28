@@ -25,6 +25,14 @@ public class MainActivity extends AppCompatActivity {
         DbAction.addEvent(newEvent);
     }
 
+    public void searchForEvent(View button) {
+        // show popup to input tag
+
+
+
+
+    }
+
     private String getEventTag() {
         return eventTag.getText().toString();
     }
@@ -32,4 +40,9 @@ public class MainActivity extends AppCompatActivity {
     private int getNumPeople() {
         return Integer.parseInt(numPeople.getText().toString());
     }
+
+    private void displayEvents() {
+        // TODO: implement
+    }
+
 }

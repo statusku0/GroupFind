@@ -39,6 +39,7 @@
         android:layout_alignStart="@+id/addEvent"
         android:layout_below="@+id/addEvent"
         android:layout_marginTop="30dp"
-        android:text="search for event" />
+        android:text="search for event"
+        android:onClick="searchForEvent"/>
 
 </RelativeLayout>
