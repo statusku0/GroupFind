@@ -8,4 +8,6 @@ import java.util.List;
  */
 public interface DbFetchCallback {
     void onEventDatabaseResultReceived(List<Event> events);
+    void onPasswordListDatabaseResultReceived(List<String> passwords);
+    void onPasswordDatabaseResultReceived(List<Event> events);
 }

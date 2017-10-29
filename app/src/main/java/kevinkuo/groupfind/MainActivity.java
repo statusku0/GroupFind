@@ -23,6 +23,8 @@ public class MainActivity extends AppCompatActivity implements DbFetchCallback {
     public EditText numPeople;
     public EditText description;
     public EditText eventTagToSearch;
+    public EditText password;
+    public EditText lookupPassword;
     public TextView address;
 
     private Location currentLocation;
@@ -44,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements DbFetchCallback {
         numPeople = (EditText) findViewById(R.id.numPeople);
         description = (EditText) findViewById(R.id.description);
         eventTagToSearch = (EditText) findViewById(R.id.eventTagToSearch);
+        password = (EditText) findViewById(R.id.password);
+        lookupPassword = (EditText) findViewById(R.id.lookupPassword);
         address = (TextView) findViewById(R.id.address);
 
         dbAction = new DbAction(this);
@@ -79,6 +83,42 @@ public class MainActivity extends AppCompatActivity implements DbFetchCallback {
     public void onEventDatabaseResultReceived(List<Event> events) {
         startActivity(EventUtilities.createIntent(
                 events, MainActivity.this, ShowEventsActivity.class));
+    }
+
+    @Override
+    public void onPasswordListDatabaseResultReceived(List<String> passwords) {
+        // get password in edittext and compare
+        final String currentPass = getPassword();
+        if (passwords.contains(currentPass)) {
+            // password taken
+            Toast.makeText(this, "password is taken",
+                    Toast.LENGTH_LONG).show();
+        } else {
+            // password not taken, add event as normal
+            try {
+                final Event newEvent = new Event(
+                        getEventTag(), getNumPeople(), getLocation(),
+                        getDescription(), getPassword());
+                dbAction.addEvent(newEvent);
+                Toast.makeText(this, "event successfully added",
+                        Toast.LENGTH_LONG).show();
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "too many people",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    public void onPasswordDatabaseResultReceived(List<Event> events) {
+        if (events.isEmpty()) {
+            Toast.makeText(this, "Event not found", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // remove event from db
+        dbAction.deleteEvent(events.get(0));
+        Toast.makeText(this, "Event deleted", Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -161,20 +201,16 @@ public class MainActivity extends AppCompatActivity implements DbFetchCallback {
     }
 
     public void addEvent(View button) {
-        try {
-            final Event newEvent = new Event(
-                    getEventTag(), getNumPeople(), getLocation(), getDescription());
-            dbAction.addEvent(newEvent);
-            Toast.makeText(this, "event successfully added",
-                    Toast.LENGTH_LONG).show();
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "too many people",
-                    Toast.LENGTH_LONG).show();
-        }
+        dbAction.getPasswords();
     }
 
     public void searchForEvent(View button) {
         dbAction.getEvents(getEventTagToSearch());
+    }
+
+    public void deleteEvent(View button) {
+        // get event from lookupPassword
+        dbAction.getEventsByPassword(getLookupPassword());
     }
 
     public void onRequestPermissionsResult(int requestCode,
@@ -241,23 +277,31 @@ public class MainActivity extends AppCompatActivity implements DbFetchCallback {
     }
 
     private String getEventTag() {
-        return eventTag.getText().toString();
+        return eventTag.getText().toString().trim();
     }
 
     private int getNumPeople() {
-        return Integer.parseInt(numPeople.getText().toString());
+        return Integer.parseInt(numPeople.getText().toString().trim());
     }
 
     private String getDescription() {
-        return description.getText().toString();
+        return description.getText().toString().trim();
     }
 
     private String getLocation() {
-        return address.getText().toString();
+        return address.getText().toString().trim();
     }
 
     private String getEventTagToSearch() {
-        return eventTagToSearch.getText().toString();
+        return eventTagToSearch.getText().toString().trim();
+    }
+
+    private String getPassword() {
+        return password.getText().toString().trim();
+    }
+
+    private String getLookupPassword() {
+        return lookupPassword.getText().toString().trim();
     }
 
 }

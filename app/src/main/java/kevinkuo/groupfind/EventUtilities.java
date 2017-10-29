@@ -71,7 +71,7 @@ public class EventUtilities {
         final List<Event> eventList = new ArrayList<>();
         for (int k1 = 0; k1 < tags.size(); k1++) {
             eventList.add(new Event(
-                    tags.get(k1), numPeoples.get(k1), locations.get(k1), descriptions.get(k1)));
+                    tags.get(k1), numPeoples.get(k1), locations.get(k1), descriptions.get(k1), ""));
         }
 
         return eventList;
@@ -88,7 +88,7 @@ public class EventUtilities {
         final List<Event> eventList = new ArrayList<>();
         for (int k1 = 0; k1 < tags.size(); k1++) {
             eventList.add(new Event(
-                    tags.get(k1), numPeoples.get(k1), locations.get(k1), descriptions.get(k1)));
+                    tags.get(k1), numPeoples.get(k1), locations.get(k1), descriptions.get(k1), ""));
         }
 
         return eventList;

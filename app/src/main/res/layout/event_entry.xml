@@ -3,41 +3,59 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/entryTagHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tag:" />
 
     <TextView
         android:id="@+id/entryTag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="13dp"
+        android:layout_below="@id/entryTagHeader"
         android:text="tag" />
+
+    <TextView
+        android:id="@+id/entryNumPeopleHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entryTag"
+        android:text="Number of people:" />
 
     <TextView
         android:id="@+id/entryNumPeople"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@id/entryTag"
-        android:layout_below="@id/entryTag"
-        android:layout_marginTop="34dp"
+        android:layout_below="@id/entryNumPeopleHeader"
         android:text="num people" />
+
+    <TextView
+        android:id="@+id/entryLocationHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entryNumPeople"
+        android:text="Location:" />
 
     <TextView
         android:id="@+id/entryLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/entryNumPeople"
-        android:layout_below="@id/entryNumPeople"
-        android:layout_marginTop="42dp"
+        android:layout_below="@id/entryLocationHeader"
         android:text="location" />
+
+    <TextView
+        android:id="@+id/entryDescriptionHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/entryLocation"
+        android:text="Description:" />
 
     <TextView
         android:id="@+id/entryDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@id/entryTag"
-        android:layout_below="@id/entryLocation"
-        android:layout_marginTop="34dp"
+        android:layout_below="@id/entryDescriptionHeader"
         android:text="description" />
 </RelativeLayout>

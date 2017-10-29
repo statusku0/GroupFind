@@ -11,16 +11,18 @@ public class Event {
     private String location;
     private String description;
     private String eventId;
+    private String password;
 
     public Event() {}
 
     public Event(final String tag, final int numPeople,
-                 final String location, final String description) {
+                 final String location, final String description, final String password) {
         this.tag = tag;
         this.numPeople = numPeople;
         this.location = location;
         this.description = description;
-        this.eventId = tag + System.currentTimeMillis();
+        this.eventId = tag + numPeople + description;
+        this.password = password;
     }
 
     public String getTag() {
@@ -41,6 +43,10 @@ public class Event {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
 }
