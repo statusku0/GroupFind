@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ShowEventsActivity extends AppCompatActivity {
@@ -21,6 +20,20 @@ public class ShowEventsActivity extends AppCompatActivity {
         eventsFromIntent = EventUtilities.getEventsFromIntent(getIntent());
 
         eventList = (ListView) findViewById(R.id.entryList);
+        eventList.setAdapter(new EventAdapter(this, new ArrayList<>(eventsFromIntent)));
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        EventUtilities.fillBundle(eventsFromIntent, savedInstanceState);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        eventsFromIntent = EventUtilities.getEventsFromBundle(savedInstanceState);
         eventList.setAdapter(new EventAdapter(this, new ArrayList<>(eventsFromIntent)));
     }
 }

@@ -17,10 +17,11 @@ import android.widget.Toast;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DbFetchCallback {
 
     public EditText eventTag;
     public EditText numPeople;
+    public EditText description;
     public EditText eventTagToSearch;
     public TextView address;
 
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private String currentAddress;
     private AddressResultReceiver addressResultReceiver;
     private LocationResultReceiver locationResultReceiver;
+    private DbAction dbAction;
 
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 0;
 
@@ -40,8 +42,11 @@ public class MainActivity extends AppCompatActivity {
 
         eventTag = (EditText) findViewById(R.id.eventTag);
         numPeople = (EditText) findViewById(R.id.numPeople);
+        description = (EditText) findViewById(R.id.description);
         eventTagToSearch = (EditText) findViewById(R.id.eventTagToSearch);
         address = (TextView) findViewById(R.id.address);
+
+        dbAction = new DbAction(this);
 
         // request location permissions if necessary
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -56,6 +61,24 @@ public class MainActivity extends AppCompatActivity {
         addressResultReceiver = new AddressResultReceiver(new Handler());
         locationResultReceiver = new LocationResultReceiver(new Handler());
         Log.d(TAG, "receivers instantiated");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString(Constants.ADDRESS, address.getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        address.setText(savedInstanceState.getString(Constants.ADDRESS));
+    }
+
+    @Override
+    public void onEventDatabaseResultReceived(List<Event> events) {
+        startActivity(EventUtilities.createIntent(
+                events, MainActivity.this, ShowEventsActivity.class));
     }
 
     /**
@@ -138,14 +161,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addEvent(View button) {
-        final Event newEvent = new Event(getEventTag(), getNumPeople(), getLocation());
-        DbAction.addEvent(newEvent);
+        try {
+            final Event newEvent = new Event(
+                    getEventTag(), getNumPeople(), getLocation(), getDescription());
+            dbAction.addEvent(newEvent);
+            Toast.makeText(this, "event successfully added",
+                    Toast.LENGTH_LONG).show();
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "too many people",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
     public void searchForEvent(View button) {
-        final List<Event> eventList = DbAction.getEvents(getEventTagToSearch());
-        startActivity(EventUtilities.createIntent(
-                eventList, MainActivity.this, ShowEventsActivity.class));
+        dbAction.getEvents(getEventTagToSearch());
     }
 
     public void onRequestPermissionsResult(int requestCode,
@@ -217,6 +246,10 @@ public class MainActivity extends AppCompatActivity {
 
     private int getNumPeople() {
         return Integer.parseInt(numPeople.getText().toString());
+    }
+
+    private String getDescription() {
+        return description.getText().toString();
     }
 
     private String getLocation() {

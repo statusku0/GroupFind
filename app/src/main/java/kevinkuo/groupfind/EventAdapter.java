@@ -29,10 +29,12 @@ public class EventAdapter extends ArrayAdapter<Event> {
         final TextView tag = (TextView) view.findViewById(R.id.entryTag);
         final TextView numPeople = (TextView) view.findViewById(R.id.entryNumPeople);
         final TextView location = (TextView) view.findViewById(R.id.entryLocation);
+        final TextView description = (TextView) view.findViewById(R.id.entryDescription);
 
         tag.setText(event.getTag());
         numPeople.setText(Integer.toString(event.getNumPeople()));
         location.setText(event.getLocation());
+        description.setText(event.getDescription());
 
         return view;
     }

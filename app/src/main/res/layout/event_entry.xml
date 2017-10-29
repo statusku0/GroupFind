@@ -31,4 +31,13 @@
         android:layout_below="@id/entryNumPeople"
         android:layout_marginTop="42dp"
         android:text="location" />
+
+    <TextView
+        android:id="@+id/entryDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/entryTag"
+        android:layout_below="@id/entryLocation"
+        android:layout_marginTop="34dp"
+        android:text="description" />
 </RelativeLayout>

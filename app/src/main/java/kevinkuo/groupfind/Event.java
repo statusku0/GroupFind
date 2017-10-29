@@ -6,14 +6,21 @@ package kevinkuo.groupfind;
 
 public class Event {
 
-    private final String tag;
-    private final int numPeople;
-    private final String location;
+    private String tag;
+    private int numPeople;
+    private String location;
+    private String description;
+    private String eventId;
 
-    public Event(final String tag, final int numPeople, final String location) {
+    public Event() {}
+
+    public Event(final String tag, final int numPeople,
+                 final String location, final String description) {
         this.tag = tag;
         this.numPeople = numPeople;
         this.location = location;
+        this.description = description;
+        this.eventId = tag + System.currentTimeMillis();
     }
 
     public String getTag() {
@@ -26,6 +33,14 @@ public class Event {
 
     public String getLocation() {
         return location;
+    }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
 }
